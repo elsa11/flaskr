@@ -7,7 +7,6 @@ from contextlib import closing
 
 #create our little appliaction:)
 app = Flask(__name__)
-#app.config.from_object(__name__)
 
 app.config.from_pyfile('config.py')
 
@@ -57,9 +56,9 @@ def login():
     error = None
     if request.method =='POST':
         if request.form['username'] != app.config['USERNAME']:
-		    error = 'Invalid username'
+            error = 'Invalid username'
         elif request.form['password'] != app.config['PASSWORD']:
-		    error = 'Invalid password'
+            error = 'Invalid password'
         else:
             session['logged_in'] = True
             flash('You were logged in')
