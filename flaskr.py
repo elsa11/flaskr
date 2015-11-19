@@ -1,5 +1,8 @@
 #all the imports
 import sqlite3
+import time
+import datetime 
+import hashlib
 from flask import Flask,request,session,g,redirect,url_for,abort,render_template,flash
 from contextlib import closing
 
@@ -32,7 +35,7 @@ def  teardowm_request(exception):
     if db is not None:
         db.close()
     g.db.close()
-	
+
 
 
 @app.route('/')
@@ -50,6 +53,19 @@ def addEntry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
 
+@app.route('/signin',methods=['POST','GET'])
+def sign():
+    error = None
+    if request.method =='POST': 
+        m = hashlib.md5()
+        m.update(request.form['password'])
+        pw = m.hexdigest()
+        print pw
+        g.db.execute('insert into user(username,password,reg_time) values(?,?,?)',[request.form['username'],pw,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+        g.db.commit()
+        flash('signin successfully')
+        return redirect(url_for('show_entries'))
+    return render_template('sign.html',error=error)
 
 @app.route('/login',methods=['GET','POST'])
 def login():

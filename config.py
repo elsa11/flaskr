@@ -1,5 +1,5 @@
 #configuration
-DATABASE = 'D:\\flaskr\\tmp\\flaskr.db'
+DATABASE = 'F:\\flaskr\\tmp\\flaskr.db'
 DEBUG = True
 SECRET_KEY = 'development key'
 USERNAME = 'admin'
