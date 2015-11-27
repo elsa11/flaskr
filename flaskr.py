@@ -71,9 +71,12 @@ def sign():
 def login():
     error = None
     if request.method =='POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        cur = g.db.cursor()
+        cur.execute("select password from user where username='%s'"%(request.form['username']))
+        rows = cur.fetchall()
+        if not rows:
+            error = 'Invalid username or Invalid password'
+        elif hashlib.md5(request.form['password']).hexdigest() !=rows[0][0]:
             error = 'Invalid password'
         else:
             session['logged_in'] = True
