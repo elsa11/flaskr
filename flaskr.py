@@ -40,17 +40,22 @@ def  teardowm_request(exception):
 
 @app.route('/')
 def show_entries():
-    cur = g.db.execute('select title,text from entries order by id desc')
-    entries = [dict(title=row[0],text=row[1]) for row in cur.fetchall()]
-    return render_template('show_entries.html',entries=entries)
+    #cur = g.db.execute('select title,text from entries order by id desc')
+    #entries = [dict(title=row[0],text=row[1]) for row in cur.fetchall()]
+    #return render_template('show_entries.html',entries=entries)
+    return render_template('add_task.html')
 
-@app.route('/add',methods=['POST'])
+@app.route('/add',methods=['POST','GET'])
 def addEntry():
+    session.pop('viewTasks',None)
     if not session.get('logged_in'):
         abort(401)
-    g.db.execute('insert into entries(title,text) values(?,?)',[request.form['title'],request.form['text']])
-    g.db.commit()
-    flash('New entry was successfully posted')
+    if request.method =='POST': 
+        userid = session.get('userid')
+        g.db.execute('insert into tasks(taskname,taskdescr,createby,createtime) values(?,?,?,?)',[request.form['title'],request.form['text'],userid,datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
+        g.db.commit()
+        flash('New task was successfully added!')
+        return redirect(url_for('show_entries'))
     return redirect(url_for('show_entries'))
 
 @app.route('/signin',methods=['POST','GET'])
@@ -72,7 +77,8 @@ def login():
     error = None
     if request.method =='POST':
         cur = g.db.cursor()
-        cur.execute("select password from user where username='%s'"%(request.form['username']))
+        cur.execute("select password,userid from user where username='%s'"%(request.form['username']))
+        name = request.form['username']
         rows = cur.fetchall()
         if not rows:
             error = 'Invalid username or Invalid password'
@@ -80,9 +86,11 @@ def login():
             error = 'Invalid password'
         else:
             session['logged_in'] = True
+            session['userid'] = rows[0][1]
             flash('You were logged in')
             return redirect(url_for('show_entries'))
     return render_template('login.html',error=error)
+
 
 
 @app.route('/logout')
@@ -90,6 +98,17 @@ def logout():
     session.pop('logged_in',None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
+
+@app.route('/viewMyTasks',methods=['GET','POST'])
+def viewMyTasks():
+    if not session.get('logged_in'):
+        abort(401)
+    userid = session.get('userid')
+    session['viewTasks'] = True
+    cur = g.db.execute("select taskname,taskdescr from tasks where createby='%s' order by createtime desc"%userid)
+    tasks = [dict(taskname=row[0],taskdescr=row[1]) for row in cur.fetchall()]
+    return render_template('show_tasks.html',tasks=tasks)
+    
 
 if __name__=='__main__':
    app.run()	

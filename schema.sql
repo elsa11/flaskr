@@ -1,6 +1,9 @@
 drop table if exists entries;
-create table entries (
-  id integer primary key autoincrement,
-  title text not null,
-  text text not null
+create table tasks (
+  taskid integer primary key autoincrement,
+  taskName text not null,
+  taskddescr text not null,
+  createby 
+  createtime 
+  status
 );
