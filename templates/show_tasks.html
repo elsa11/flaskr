@@ -1,0 +1,11 @@
+{% extends "layout.html"%}
+{% block body %}
+   <ul class=tasks>
+   {%for task in tasks%}
+     <li><h2>{{task.taskname}}</h2>{{task.taskdescr|safe}}</li>
+   {% else %}
+     <li><em>Unbelievable. No tasks here so far</em></li>
+   {% endfor %}
+   </ul>
+{% endblock %}
+   
