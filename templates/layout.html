@@ -5,13 +5,13 @@
   <h1>To Do List</h1>
   <div class=metanav>
   {% if not session.logged_in %}
-    <a href="{{url_for('login')}}">log in</a>
-    <a href="{{url_for('sign')}}">sign in</a>
+    <a href="{{url_for('login')}}">Log In</a>
+    <a href="{{url_for('sign')}}">Sign In</a>
   {% elif  session.viewTasks %}
-     <a href="{{url_for('logout')}}">log out</a>
+     <a href="{{url_for('logout')}}">Log Out</a>
     <a href="{{url_for('addEntry')}}">Add tasks</a>
   {% else %}
-    <a href="{{url_for('logout')}}">log out</a>
+    <a href="{{url_for('logout')}}">Log Out</a>
     <a href="{{url_for('viewMyTasks')}}">View Tasks</a>
   {% endif %}
   </div>

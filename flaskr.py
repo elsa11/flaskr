@@ -96,6 +96,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('logged_in',None)
+    session.pop('viewTasks',None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
@@ -108,7 +109,29 @@ def viewMyTasks():
     cur = g.db.execute("select taskname,taskdescr from tasks where createby='%s' order by createtime desc"%userid)
     tasks = [dict(taskname=row[0],taskdescr=row[1]) for row in cur.fetchall()]
     return render_template('show_tasks.html',tasks=tasks)
-    
+
+
+
+@app.route('/searchTasks',methods=['GET','POST'])
+def searchTasks():
+    if request.method =='POST':
+        if not session.get('logged_in'):
+            abort(401)
+        userid = session.get('userid')
+        taskname = request.form['taskname']
+        if not taskname:
+            cur = g.db.execute("select taskname,taskdescr from tasks where createby='%s' order by createtime desc"%userid)
+            tasks = [dict(taskname=row[0],taskdescr=row[1]) for row in cur.fetchall()]
+            return render_template('show_tasks.html',tasks=tasks)
+        else:
+            cur = g.db.execute("select taskname,taskdescr from tasks where createby='%s' and taskname='%s'  order by createtime desc"%(userid,request.form['taskname']))
+            if not cur:
+                return redirect('show_tasks.html')
+            else:
+                tasks = [dict(taskname=row[0],taskdescr=row[1]) for row in cur.fetchall()]
+                return render_template('show_tasks.html',tasks=tasks)
+
+       
 
 if __name__=='__main__':
    app.run()	
